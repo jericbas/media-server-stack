@@ -1,0 +1,81 @@
+version: "3.9"
+services:
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Manila
+      - WEBUI_PORT=8080
+    volumes:
+      - C:/Docker/qbittorrent/config:/config
+      - C:/Docker/qbittorrent/downloads:/downloads
+      - C:/Docker/jellyfin/media:/media
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+    networks:
+      - media_network
+    labels:
+      - "com.docker.compose.project=media-server-stack"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 60s
+      retries: 3
+      timeout: 10s
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Manila
+    volumes:
+      - C:/Docker/jellyfin/config:/config
+      - C:/Docker/jellyfin/cache:/cache
+      - C:/Docker/jellyfin/media:/media
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+    networks:
+      - media_network
+    labels:
+      - "com.docker.compose.project=media-server-stack"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096"]
+      interval: 60s
+      retries: 3
+      timeout: 10s
+
+  monitor:
+    build:
+      context: ./monitor
+      dockerfile: Dockerfile
+    container_name: monitor
+    environment:
+      - QBITTORRENT_USERNAME=admin  # Replace with your qBittorrent username
+      - QBITTORRENT_PASSWORD=adminadmin  # Replace with your qBittorrent password
+      - WLAN_IP=192.168.1.80  # Update with output from get_wlan_ip.ps1
+    volumes:
+      - C:/Docker:/host/docker:ro
+    ports:
+      - 80:80
+    restart: unless-stopped
+    networks:
+      - media_network
+    labels:
+      - "com.docker.compose.project=media-server-stack"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      retries: 3
+      timeout: 10s
+
+networks:
+  media_network:
+    driver: bridge
+    name: media_network

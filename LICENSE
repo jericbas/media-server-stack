@@ -1,0 +1,42 @@
+MIT License
+
+Copyright (c) 2025 Jeric Bas
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+How to Run:
+
+1. Ensure Docker Desktop is installed and running on Windows.
+2. Create the required directories:
+   - C:/Docker/qbittorrent/config
+   - C:/Docker/qbittorrent/downloads
+   - C:/Docker/jellyfin/config
+   - C:/Docker/jellyfin/cache
+   - C:/Docker/jellyfin/media
+3. (Optional) Edit `docker-compose.yml` to set your WLAN_IP if needed.
+4. Open PowerShell in the project directory and run:
+
+   docker-compose up -d --build
+
+5. Access the services in your browser:
+   - Monitor Dashboard: http://[WLAN_IP]
+   - Jellyfin: http://[WLAN_IP]:8096
+   - qBittorrent: http://[WLAN_IP]:8080

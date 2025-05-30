@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #2f855a, #2b6cb0); /* Fallback gradient */
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* Background image containers */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transition: opacity 1s ease-in-out;
+        }
+        #bg-current {
+            opacity: 1;
+        }
+        #bg-next {
+            opacity: 0;
+        }
+        /* Semi-transparent overlay for readability */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4); /* Light theme */
+            z-index: 0;
+        }
+        .dark .bg-overlay {
+            background: rgba(0, 0, 0, 0.6); /* Dark theme */
+        }
+        .container {
+            position: relative;
+            z-index: 1; /* Content above overlay */
+        }
+        .theme-toggle-icon {
+            transition: transform 0.3s ease;
+        }
+        .theme-toggle-icon.sun {
+            transform: rotate(0deg);
+        }
+        .theme-toggle-icon.moon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Background images -->
+    <div id="bg-current" class="bg-image"></div>
+    <div id="bg-next" class="bg-image"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="container mx-auto p-6 max-w-4xl">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-white drop-shadow-md">System Monitor 🌿</h1>
+            <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                <svg id="theme-icon" class="w-6 h-6 theme-toggle-icon sun" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="bg-white dark:bg-gray-800 bg-opacity-90 shadow-lg rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">System Stats 📊</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Free Disk Space (C:/Docker) 💾</p>
+                        <p id="disk-space" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading...</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">PC Temperature 🌡️</p>
+                        <p id="temperature" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading...</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Jellyfin Version 📺</p>
+                        <p id="jellyfin-version" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading...</p>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-8 h-8 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">qBittorrent Version ⬇️</p>
+                        <p id="qbittorrent-version" class="text-lg font-medium text-gray-800 dark:text-gray-200">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links Card -->
+        <div class="bg-white dark:bg-gray-800 bg-opacity-90 shadow-lg rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Quick Links 🔗</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a id="jellyfin-link" href="#" class="flex items-center justify-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                    </svg>
+                    Jellyfin 📺
+                </a>
+                <a id="qbittorrent-link" href="#" class="flex items-center justify-center bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    qBittorrent ⬇️
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Background image slideshow
+        const bgCurrent = document.getElementById('bg-current');
+        const bgNext = document.getElementById('bg-next');
+        const images = [
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80', // Beach
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80', // Forest
+            'https://images.unsplash.com/photo-1469474968028-566ce2e7e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80', // Mountains
+            'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80', // Lake
+            'https://images.unsplash.com/photo-1501854140801-50d0160c81cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'  // Waterfall
+        ];
+
+        function getRandomImage() {
+            return images[Math.floor(Math.random() * images.length)];
+        }
+
+        function changeBackground() {
+            const newImage = getRandomImage();
+            bgNext.style.backgroundImage = `url('${newImage}')`;
+            bgNext.style.opacity = 1;
+
+            setTimeout(() => {
+                bgCurrent.style.backgroundImage = `url('${newImage}')`;
+                bgCurrent.style.opacity = 1;
+                bgNext.style.opacity = 0;
+            }, 1000); // Match CSS transition duration
+        }
+
+        // Initial background
+        bgCurrent.style.backgroundImage = `url('${getRandomImage()}')`;
+        setInterval(changeBackground, 5000); // Change every 5 seconds
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            themeIcon.className = `w-6 h-6 theme-toggle-icon ${isDark ? 'moon' : 'sun'}`;
+            themeIcon.innerHTML = isDark
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"></path>'
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+        });
+
+        // Fetch stats and set links
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                // Update stats
+                document.getElementById('disk-space').textContent =
+                    data.disk.error ? data.disk.error : `${data.disk.free_space_gb} GB`;
+                document.getElementById('temperature').textContent = data.temperature;
+                document.getElementById('jellyfin-version').textContent = data.jellyfin_version;
+                document.getElementById('qbittorrent-version').textContent = data.qbittorrent_version;
+
+                // Get WLAN IP
+                let wlanIp = data.wlan_ip === 'dynamic' ? window.location.hostname : data.wlan_ip;
+                if (!wlanIp || wlanIp === 'localhost') {
+                    wlanIp = '192.168.1.80'; // Fallback IP (update as needed)
+                }
+
+                // Set quick links
+                document.getElementById('jellyfin-link').href = `http://${wlanIp}:8096`;
+                document.getElementById('qbittorrent-link').href = `http://${wlanIp}:8080`;
+            })
+            .catch(error => {
+                document.getElementById('disk-space').textContent = 'Error fetching data';
+                document.getElementById('temperature').textContent = 'Error fetching data';
+                document.getElementById('jellyfin-version').textContent = 'Error fetching data';
+                document.getElementById('qbittorrent-version').textContent = 'Error fetching data';
+                document.getElementById('jellyfin-link').href = 'http://192.168.1.100:8096';
+                document.getElementById('qbittorrent-link').href = 'http://192.168.1.100:8080';
+            });
+    </script>
+</body>
+</html>

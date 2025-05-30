@@ -1,0 +1,30 @@
+# Ignore Python virtual environments
+monitor/app/venv/
+
+# Ignore Python cache
+__pycache__/
+monitor/app/__pycache__/
+
+# Ignore Docker volumes and system files
+C:/Docker/
+
+# Ignore VSCode settings
+.vscode/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+
+# Ignore environment files
+.env
+
+# Ignore compiled files
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore node_modules if any
+node_modules/

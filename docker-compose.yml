@@ -38,11 +38,8 @@ services:
       - C:/Docker/jellyfin/config:/config
       - C:/Docker/jellyfin/cache:/cache
       - C:/Docker/jellyfin/media:/media
-    ports:
-      - 8096:8096
+    network_mode: host
     restart: unless-stopped
-    networks:
-      - media_network
     labels:
       - "com.docker.compose.project=media-server-stack"
     healthcheck:
@@ -57,9 +54,9 @@ services:
       dockerfile: Dockerfile
     container_name: monitor
     environment:
-      - QBITTORRENT_USERNAME=admin  # Replace with your qBittorrent username
-      - QBITTORRENT_PASSWORD=adminadmin  # Replace with your qBittorrent password
-      - WLAN_IP=192.168.1.80  # Update with output from get_wlan_ip.ps1
+      - QBITTORRENT_USERNAME=admin
+      - QBITTORRENT_PASSWORD=adminadmin
+      - WLAN_IP=127.0.0.1
     volumes:
       - C:/Docker:/host/docker:ro
     ports:
